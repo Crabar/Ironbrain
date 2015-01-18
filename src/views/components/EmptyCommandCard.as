@@ -4,6 +4,8 @@
 package views.components {
 import controllers.PlaygroundController;
 
+import events.ModelEvent;
+
 import feathers.dragDrop.DragData;
 import feathers.dragDrop.DragDropManager;
 import feathers.dragDrop.IDragSource;
@@ -30,14 +32,15 @@ import utils.ResourcesManager;
 public class EmptyCommandCard extends Sprite implements IDragSource, IDropTarget {
     public function EmptyCommandCard(controller:PlaygroundController, model:PlaygroundModel) {
         super();
+        addTextField();
         _controller = controller;
         _model = model;
-        drawBackground();
-        addTextField();
+        _model.addEventListener(ModelEvent.DATA_CHANGED, onDataChanged);
         addEventListener(DragDropEvent.DRAG_ENTER, onDragEnter);
         addEventListener(DragDropEvent.DRAG_DROP, onDragDrop);
         addEventListener(DragDropEvent.DRAG_COMPLETE, onDragComplete);
         addEventListener(TouchEvent.TOUCH, onTouch);
+        drawCard(activeCommand);
     }
 
     private var _controller:PlaygroundController;
@@ -55,18 +58,16 @@ public class EmptyCommandCard extends Sprite implements IDragSource, IDropTarget
         _textField.text = (orderIndex + 1).toString();
     }
 
-    private function drawSelectedCard():void {
-        drawBackground(ResourcesManager.getTexture(activeCommand.textureName));
-        _textField.visible = false;
-    }
-
     private function addTextField():void {
         _textField = new TextField(width, 40, "", "Verdana", 24, 0, true);
         addChild(_textField);
     }
 
-    private function drawBackground(texture:Texture = null):void {
-        if (!texture) {
+    private function drawCard(command:ICommand):void {
+        var texture:Texture;
+        if (!command) {
+            _textField.visible = true;
+            //
             var card:flash.display.Sprite = new flash.display.Sprite();
             card.graphics.lineStyle(2, 0x3333ff);
             card.graphics.drawRoundRect(0, 0, 60, 60, 10, 10);
@@ -74,21 +75,27 @@ public class EmptyCommandCard extends Sprite implements IDragSource, IDropTarget
             var bitmapData:BitmapData = new BitmapData(bounds.width, bounds.height, true, 0xffffff);
             bitmapData.draw(card, new Matrix(1, 0, 0, 1, -bounds.left, -bounds.top));
             texture = Texture.fromBitmapData(bitmapData);
+        } else {
+            texture = ResourcesManager.getTexture(activeCommand.textureName);
+            _textField.visible = false;
         }
 
         if (!_image) {
             _image = new Image(texture);
-            addChild(_image);
+            addChildAt(_image, 0);
         } else {
             _image.texture = texture;
         }
     }
 
+    private function onDataChanged(event:ModelEvent):void {
+        drawCard(activeCommand);
+    }
+
     private function onDragComplete(event:DragDropEvent):void {
         if (event.isDropped) {
             _controller.removeActiveCommand(_order);
-            drawBackground();
-            _textField.visible = true;
+            drawCard(activeCommand);
         }
     }
 
@@ -98,7 +105,7 @@ public class EmptyCommandCard extends Sprite implements IDragSource, IDropTarget
         }
 
         _controller.addActiveCommand(_order, event.dragData.getDataForFormat("addCard") as ICommand);
-        drawSelectedCard();
+        drawCard(activeCommand);
     }
 
     private function onDragEnter(event:DragDropEvent):void {

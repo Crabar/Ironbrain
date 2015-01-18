@@ -2,6 +2,8 @@
  * Created by Crabar on 1/17/15.
  */
 package controllers {
+import events.ModelEvent;
+
 import flash.utils.setTimeout;
 
 import models.CommandsDeck;
@@ -60,6 +62,13 @@ public class PlaygroundController {
         _model.deck.shuffle();
     }
 
+    private function returnUnusedCommandsToDeck():void {
+        for (var i:int = 0; i < _model.availableCommands.length; i++) {
+            var command:ICommand = _model.availableCommands[i];
+            _model.deck.addCommand(command);
+        }
+    }
+
     public function generateAvailableCards():void {
         _model.availableCommands = new <ICommand>[];
         var oneCommand:ICommand;
@@ -80,8 +89,15 @@ public class PlaygroundController {
             command.execute(_model.mainRobot, _model);
         }
 
+        startNewRound();
+    }
+
+    public function startNewRound():void {
+        returnUnusedCommandsToDeck();
         clearActiveCommands();
+        _model.deck.shuffle();
         generateAvailableCards();
+        _model.dispatchEvent(new ModelEvent(ModelEvent.DATA_CHANGED));
     }
 
     public function addActiveCommand(order:uint, command:ICommand):void {

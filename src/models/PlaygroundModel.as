@@ -11,9 +11,9 @@ import models.playground.Cell;
 
 import views.objects.RobotViewObject;
 
-public class PlaygroundModel extends EventDispatcher {
+public class PlaygroundModel extends BaseModel {
     public function PlaygroundModel() {
-        super(null);
+        super();
     }
 
     public var field:Vector.<Vector.<Cell>>;

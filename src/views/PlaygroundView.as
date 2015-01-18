@@ -4,6 +4,8 @@
 package views {
 import controllers.PlaygroundController;
 
+import events.ModelEvent;
+
 import feathers.controls.Button;
 
 import feathers.controls.List;
@@ -48,11 +50,18 @@ public class PlaygroundView extends BaseView {
 
     override public function set model(value:EventDispatcher):void {
         super.model = value;
+        curModel.addEventListener(ModelEvent.DATA_CHANGED, onDataChanged);
         _controller = new PlaygroundController(curModel);
         drawField();
         initPlayer();
         drawAvailableCards();
         createActiveCardsList();
+    }
+
+    private function onDataChanged(event:ModelEvent):void {
+        if (_availableCardsList) {
+            drawAvailableCards();
+        }
     }
 
     private function drawAvailableCards():void {
