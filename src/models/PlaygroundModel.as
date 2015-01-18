@@ -2,8 +2,6 @@
  * Created by Crabar on 1/17/15.
  */
 package models {
-import flash.events.EventDispatcher;
-import flash.events.IEventDispatcher;
 
 import models.commands.ICommand;
 

@@ -3,15 +3,23 @@
  */
 package views.objects {
 
+import events.AnimationEvent;
+
 import flash.display.BitmapData;
 import flash.geom.Matrix;
 import flash.geom.Rectangle;
 
 import models.playground.Cell;
 
+import starling.animation.Transitions;
+
+import starling.animation.Tween;
+import starling.core.Starling;
+
 import starling.display.Image;
 import starling.textures.Texture;
 
+[Event(name="animationEnded", type="events.AnimationEvent")]
 public class RobotViewObject extends Image {
     public function RobotViewObject() {
         super(getRobotTexture());
@@ -37,8 +45,10 @@ public class RobotViewObject extends Image {
     }
 
     public function moveTo(targetCell:Cell):void {
-        x = targetCell.x + (targetCell.width) / 2;
-        y = targetCell.y + (targetCell.height) / 2;
+        var tween:Tween = new Tween(this, 1, Transitions.EASE_IN_OUT);
+        tween.moveTo(targetCell.x + (targetCell.width) / 2, targetCell.y + (targetCell.height) / 2);
+        tween.onComplete = function():void { dispatchEventWith(AnimationEvent.ANIMATION_ENDED) };
+        Starling.juggler.add(tween);
         _currentPosition = targetCell;
     }
 
@@ -47,7 +57,10 @@ public class RobotViewObject extends Image {
     }
 
     public function rotate(degrees:Number):void {
-        rotation = (rotation + (degrees / 180) * Math.PI);
+        var tween:Tween = new Tween(this, 1, Transitions.EASE_IN_OUT);
+        tween.animate("rotation", (rotation + (degrees / 180) * Math.PI));
+        tween.onComplete = function():void { dispatchEventWith(AnimationEvent.ANIMATION_ENDED) };
+        Starling.juggler.add(tween);
     }
 
     public function get currentDirection():Number {

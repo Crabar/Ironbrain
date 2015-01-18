@@ -2,16 +2,22 @@
  * Created by Crabar on 1/18/15.
  */
 package models.commands {
-import models.PlaygroundModel;
-import models.playground.Cell;
+import events.AnimationEvent;
+import events.CommandEvent;
+import events.CommandEvent;
 
+import flash.events.EventDispatcher;
+
+import models.PlaygroundModel;
 import views.objects.RobotViewObject;
 
-public class MoveForwardBy1 implements ICommand {
+[Event(name="commandEnded", type="events.CommandEvent")]
+public class MoveForwardBy1 extends BaseCommand implements ICommand {
     public function MoveForwardBy1() {
     }
 
-    public function execute(curRobot:RobotViewObject, playgroundModel:PlaygroundModel):void {
+    override public function execute(curRobot:RobotViewObject, playgroundModel:PlaygroundModel):void {
+        super.execute(curRobot, playgroundModel);
         var targetPositionRowIndex:uint = curRobot.currentPosition.rowIndex;
         var targetPositionColumnIndex:uint = curRobot.currentPosition.colIndex;
 
@@ -43,11 +49,12 @@ public class MoveForwardBy1 implements ICommand {
         curRobot.moveTo(playgroundModel.field[targetPositionRowIndex][targetPositionColumnIndex]);
     }
 
-    public function get title():String {
+
+    override public function get title():String {
         return "Move forward on one cell";
     }
 
-    public function get textureName():String {
+    override public function get textureName():String {
         return "move_forward_by_1_card";
     }
 }

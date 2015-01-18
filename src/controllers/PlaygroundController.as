@@ -2,9 +2,8 @@
  * Created by Crabar on 1/17/15.
  */
 package controllers {
+import events.CommandEvent;
 import events.ModelEvent;
-
-import flash.utils.setTimeout;
 
 import models.CommandsDeck;
 import models.PlaygroundModel;
@@ -62,13 +61,6 @@ public class PlaygroundController {
         _model.deck.shuffle();
     }
 
-    private function returnUnusedCommandsToDeck():void {
-        for (var i:int = 0; i < _model.availableCommands.length; i++) {
-            var command:ICommand = _model.availableCommands[i];
-            _model.deck.addCommand(command);
-        }
-    }
-
     public function generateAvailableCards():void {
         _model.availableCommands = new <ICommand>[];
         var oneCommand:ICommand;
@@ -83,13 +75,21 @@ public class PlaygroundController {
         _model.activeCommands = new Vector.<ICommand>(4);
     }
 
-    public function playRound():void {
-        for (var i:int = 0; i < _model.activeCommands.length; i++) {
-            var command:ICommand = _model.activeCommands[i];
-            command.execute(_model.mainRobot, _model);
+    private function executeActiveCommandsRecursive(commandIndex:uint):void {
+        if (commandIndex >= _model.activeCommands.length) {
+            startNewRound();
+            return;
         }
 
-        startNewRound();
+        var curCommand:ICommand = _model.activeCommands[commandIndex];
+        curCommand.addEventListener(CommandEvent.COMMAND_ENDED, function (event:CommandEvent):void {
+            executeActiveCommandsRecursive(commandIndex + 1);
+        }, false, 0, true);
+        curCommand.execute(_model.mainRobot, _model);
+    }
+
+    public function playRound():void {
+        executeActiveCommandsRecursive(0);
     }
 
     public function startNewRound():void {
@@ -110,6 +110,13 @@ public class PlaygroundController {
 
     public function addAvailableCommand(command:ICommand):void {
         _model.availableCommands.push(command);
+    }
+
+    private function returnUnusedCommandsToDeck():void {
+        for (var i:int = 0; i < _model.availableCommands.length; i++) {
+            var command:ICommand = _model.availableCommands[i];
+            _model.deck.addCommand(command);
+        }
     }
 }
 }

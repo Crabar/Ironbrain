@@ -32,7 +32,6 @@ import utils.ResourcesManager;
 public class EmptyCommandCard extends Sprite implements IDragSource, IDropTarget {
     public function EmptyCommandCard(controller:PlaygroundController, model:PlaygroundModel) {
         super();
-        addTextField();
         _controller = controller;
         _model = model;
         _model.addEventListener(ModelEvent.DATA_CHANGED, onDataChanged);
@@ -41,6 +40,7 @@ public class EmptyCommandCard extends Sprite implements IDragSource, IDropTarget
         addEventListener(DragDropEvent.DRAG_COMPLETE, onDragComplete);
         addEventListener(TouchEvent.TOUCH, onTouch);
         drawCard(activeCommand);
+        addTextField();
     }
 
     private var _controller:PlaygroundController;
@@ -66,7 +66,8 @@ public class EmptyCommandCard extends Sprite implements IDragSource, IDropTarget
     private function drawCard(command:ICommand):void {
         var texture:Texture;
         if (!command) {
-            _textField.visible = true;
+            if (_textField)
+                _textField.visible = true;
             //
             var card:flash.display.Sprite = new flash.display.Sprite();
             card.graphics.lineStyle(2, 0x3333ff);
@@ -77,7 +78,8 @@ public class EmptyCommandCard extends Sprite implements IDragSource, IDropTarget
             texture = Texture.fromBitmapData(bitmapData);
         } else {
             texture = ResourcesManager.getTexture(activeCommand.textureName);
-            _textField.visible = false;
+            if (_textField)
+                _textField.visible = false;
         }
 
         if (!_image) {
