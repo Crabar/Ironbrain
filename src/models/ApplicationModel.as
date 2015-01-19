@@ -46,7 +46,7 @@ public class ApplicationModel extends EventDispatcher {
         VIEW_MODELS[PLAYGROUND_VIEW] = new PlaygroundModel();
     }
 
-    public function getModel(view:String):EventDispatcher {
+    public function getModel(view:String):BaseModel {
         return VIEW_MODELS[view];
     }
 }

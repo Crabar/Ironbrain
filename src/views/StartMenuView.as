@@ -9,6 +9,8 @@ import feathers.data.ListCollection;
 
 import flash.events.EventDispatcher;
 
+import models.BaseModel;
+
 import starling.display.Image;
 import starling.events.Event;
 import starling.textures.Texture;
@@ -25,7 +27,7 @@ public class StartMenuView extends BaseView {
         createButtons();
     }
 
-    override public function set model(value:EventDispatcher):void {
+    override public function set model(value:BaseModel):void {
         _controller = new StartMenuController();
     }
 

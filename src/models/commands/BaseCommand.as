@@ -5,27 +5,26 @@ package models.commands {
 import events.AnimationEvent;
 import events.CommandEvent;
 
-import flash.events.EventDispatcher;
-import flash.events.IEventDispatcher;
 
 import models.PlaygroundModel;
 
 import starling.events.Event;
+import starling.events.EventDispatcher;
 
-import views.objects.RobotViewObject;
+import models.objects.Robot;
 
 public class BaseCommand extends EventDispatcher implements ICommand {
     public function BaseCommand() {
-        super(null);
+        super();
     }
 
-    public function execute(curRobot:RobotViewObject, playgroundModel:PlaygroundModel):void {
+    public function execute(curRobot:Robot, playgroundModel:PlaygroundModel):void {
         curRobot.addEventListener(AnimationEvent.ANIMATION_ENDED, onAnimationEnded);
     }
 
     private function onAnimationEnded(event:Event):void {
         event.currentTarget.removeEventListener(AnimationEvent.ANIMATION_ENDED, onAnimationEnded);
-        dispatchEvent(new CommandEvent(CommandEvent.COMMAND_ENDED));
+        dispatchEventWith(CommandEvent.COMMAND_ENDED);
     }
 
     public function get title():String {

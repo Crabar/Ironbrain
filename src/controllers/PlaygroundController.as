@@ -13,7 +13,9 @@ import models.commands.TurnLeftCommand;
 import models.commands.TurnRightCommand;
 import models.playground.Cell;
 
-import views.objects.RobotViewObject;
+import models.objects.Robot;
+
+import starling.events.Event;
 
 public class PlaygroundController {
     public function PlaygroundController(model:PlaygroundModel) {
@@ -36,7 +38,7 @@ public class PlaygroundController {
     }
 
     public function createRobot():void {
-        _model.mainRobot = new RobotViewObject();
+        _model.mainRobot = new Robot();
         _model.mainRobot.moveTo(_model.field[9][3]);
     }
 
@@ -82,9 +84,9 @@ public class PlaygroundController {
         }
 
         var curCommand:ICommand = _model.activeCommands[commandIndex];
-        curCommand.addEventListener(CommandEvent.COMMAND_ENDED, function (event:CommandEvent):void {
+        curCommand.addEventListener(CommandEvent.COMMAND_ENDED, function (event:Event):void {
             executeActiveCommandsRecursive(commandIndex + 1);
-        }, false, 0, true);
+        });
         curCommand.execute(_model.mainRobot, _model);
     }
 
@@ -113,10 +115,19 @@ public class PlaygroundController {
     }
 
     private function returnUnusedCommandsToDeck():void {
-        for (var i:int = 0; i < _model.availableCommands.length; i++) {
-            var command:ICommand = _model.availableCommands[i];
-            _model.deck.addCommand(command);
+        if (_model.availableCommands) {
+            for (var i:int = 0; i < _model.availableCommands.length; i++) {
+                var command:ICommand = _model.availableCommands[i];
+                _model.deck.addCommand(command);
+            }
         }
+    }
+
+    public function preparePlayground():void {
+        generateField(Game.WIDTH - 1, Game.WIDTH - 1, 10, 10);
+        createRobot();
+        generateDeck(); // temporary
+        startNewRound();
     }
 }
 }

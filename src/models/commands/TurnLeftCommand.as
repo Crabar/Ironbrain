@@ -5,13 +5,13 @@ package models.commands {
 import models.PlaygroundModel;
 import models.commands.BaseCommand;
 
-import views.objects.RobotViewObject;
+import models.objects.Robot;
 
 public class TurnLeftCommand extends BaseCommand implements ICommand {
     public function TurnLeftCommand() {
     }
 
-    override public function execute(curRobot:RobotViewObject, playgroundModel:PlaygroundModel):void {
+    override public function execute(curRobot:Robot, playgroundModel:PlaygroundModel):void {
         super.execute(curRobot, playgroundModel);
         curRobot.rotate(-90);
     }

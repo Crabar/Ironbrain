@@ -7,7 +7,7 @@ import models.commands.ICommand;
 
 import models.playground.Cell;
 
-import views.objects.RobotViewObject;
+import models.objects.Robot;
 
 public class PlaygroundModel extends BaseModel {
     public function PlaygroundModel() {
@@ -15,7 +15,7 @@ public class PlaygroundModel extends BaseModel {
     }
 
     public var field:Vector.<Vector.<Cell>>;
-    public var mainRobot:RobotViewObject;
+    public var mainRobot:Robot;
     public var deck:CommandsDeck;
     public var availableCommands:Vector.<ICommand>;
     public var activeCommands:Vector.<ICommand>;

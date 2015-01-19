@@ -7,22 +7,17 @@ import controllers.PlaygroundController;
 import events.ModelEvent;
 
 import feathers.controls.Button;
-
 import feathers.controls.List;
 import feathers.controls.Scroller;
-import feathers.controls.renderers.DefaultListItemRenderer;
 import feathers.controls.renderers.IListItemRenderer;
 import feathers.data.ListCollection;
 import feathers.layout.HorizontalLayout;
-import feathers.text.BitmapFontTextFormat;
 
 import flash.display.BitmapData;
-
-
-import flash.events.EventDispatcher;
 import flash.geom.Matrix;
 import flash.geom.Rectangle;
 
+import models.BaseModel;
 import models.PlaygroundModel;
 import models.playground.Cell;
 
@@ -33,10 +28,7 @@ import starling.textures.Texture;
 
 import views.components.CommandCardItemRenderer;
 import views.components.DraggableList;
-
 import views.components.EmptyCommandCard;
-
-import views.objects.RobotViewObject;
 
 public class PlaygroundView extends BaseView {
     public function PlaygroundView() {
@@ -48,31 +40,20 @@ public class PlaygroundView extends BaseView {
     private var _robotsLayer:Sprite;
     private var _availableCardsList:List;
 
-    override public function set model(value:EventDispatcher):void {
+    override public function set model(value:BaseModel):void {
         super.model = value;
         curModel.addEventListener(ModelEvent.DATA_CHANGED, onDataChanged);
         _controller = new PlaygroundController(curModel);
+        _controller.preparePlayground();
         drawField();
         initPlayer();
         drawAvailableCards();
         createActiveCardsList();
     }
 
-    private function onDataChanged(event:ModelEvent):void {
-        if (_availableCardsList) {
-            drawAvailableCards();
-        }
-    }
 
-    private function drawAvailableCards():void {
-        _availableCardsList.dataProvider = new ListCollection(curModel.availableCommands);
-    }
-
-    private function initPlayer():void {
-        _controller.createRobot();
-        _robotsLayer.addChild(curModel.mainRobot);
-        _controller.generateDeck();
-        _controller.generateAvailableCards();
+    private function get curModel():PlaygroundModel {
+        return model as PlaygroundModel;
     }
 
     override protected function createChildren():void {
@@ -81,6 +62,14 @@ public class PlaygroundView extends BaseView {
         createRobotsLayer();
         createAvailableCardsList();
         createPlayButton();
+    }
+
+    private function drawAvailableCards():void {
+        _availableCardsList.dataProvider = new ListCollection(curModel.availableCommands);
+    }
+
+    private function initPlayer():void {
+        _robotsLayer.addChild(curModel.mainRobot.view);
     }
 
     private function createPlayButton():void {
@@ -93,21 +82,19 @@ public class PlaygroundView extends BaseView {
         addChild(button);
     }
 
-    private function onButtonClick(event:Event):void {
-        _controller.playRound();
-    }
-
     private function createAvailableCardsList():void {
         _availableCardsList = new DraggableList();
         var layout:HorizontalLayout = new HorizontalLayout();
         _availableCardsList.layout = layout;
-        _availableCardsList.interactionMode = Scroller.INTERACTION_MODE_TOUCH;
+        _availableCardsList.horizontalScrollPolicy = "off";
         _availableCardsList.isSelectable = false;
-        _availableCardsList.itemRendererFactory = function():IListItemRenderer {
+        _availableCardsList.itemRendererFactory = function ():IListItemRenderer {
             var renderer:CommandCardItemRenderer = new CommandCardItemRenderer();
             renderer.width = 40;
             renderer.height = 40;
-            renderer.labelFunction = function(data:Object):String { return ""; };
+            renderer.labelFunction = function (data:Object):String {
+                return "";
+            };
             return renderer;
         };
 
@@ -139,7 +126,7 @@ public class PlaygroundView extends BaseView {
         addChild(_robotsLayer);
     }
 
-    private function drawCells():void {
+    private function drawField():void {
         var field:flash.display.Sprite = new flash.display.Sprite();
         field.graphics.lineStyle(1, 0x000000);
 
@@ -157,11 +144,6 @@ public class PlaygroundView extends BaseView {
         _fieldLayer.addChild(image);
     }
 
-    private function drawField():void {
-        _controller.generateField(Game.WIDTH - 1, Game.WIDTH - 1, 10, 10);
-        drawCells();
-    }
-
     private function drawBackground():void {
         _background = new Image(Texture.fromColor(1, 1, 0xfffdfdff));
         _background.width = Game.WIDTH;
@@ -169,8 +151,14 @@ public class PlaygroundView extends BaseView {
         addChild(_background);
     }
 
-    private function get curModel():PlaygroundModel {
-        return model as PlaygroundModel;
+    private function onDataChanged(event:ModelEvent):void {
+        if (_availableCardsList) {
+            drawAvailableCards();
+        }
+    }
+
+    private function onButtonClick(event:Event):void {
+        _controller.playRound();
     }
 }
 }

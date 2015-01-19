@@ -1,5 +1,6 @@
 package views {
-import flash.events.EventDispatcher;
+
+import models.BaseModel;
 
 import starling.display.Image;
 import starling.display.Sprite;
@@ -8,13 +9,13 @@ import starling.events.Event;
 public class BaseView extends Sprite {
     protected var _background:Image;
 
-    private var _model:EventDispatcher;
+    private var _model:BaseModel;
 
-    public function get model():EventDispatcher {
+    public function get model():BaseModel {
         return _model;
     }
 
-    public function set model(value:EventDispatcher):void {
+    public function set model(value:BaseModel):void {
         _model = value;
     }
 

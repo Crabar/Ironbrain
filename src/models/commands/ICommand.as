@@ -6,11 +6,14 @@ import flash.events.IEventDispatcher;
 
 import models.PlaygroundModel;
 
-import views.objects.RobotViewObject;
+import starling.events.Event;
 
-public interface ICommand extends IEventDispatcher{
-    function execute(curRobot:RobotViewObject, playgroundModel:PlaygroundModel):void;
+import models.objects.Robot;
+
+public interface ICommand {
+    function execute(curRobot:Robot, playgroundModel:PlaygroundModel):void;
     function get title():String;
     function get textureName():String;
+    function addEventListener(eventType:String, listener:Function):void;
 }
 }
