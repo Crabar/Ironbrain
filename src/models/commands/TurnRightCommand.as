@@ -11,8 +11,8 @@ public class TurnRightCommand extends BaseCommand implements ICommand {
     public function TurnRightCommand() {
     }
 
-    override public function execute(curRobot:Robot, playgroundModel:PlaygroundModel):void {
-        super.execute(curRobot, playgroundModel);
+    override public function execute(curRobot:Robot, playgroundModel:PlaygroundModel, commandOrder:uint):void {
+        super.execute(curRobot, playgroundModel, commandOrder);
         curRobot.rotate(90);
     }
 

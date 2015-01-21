@@ -10,6 +10,7 @@ public class Cell {
         _height = height;
         _rowIndex = rowIndex;
         _colIndex = colIndex;
+        _children = new <CellObject>[];
     }
 
     private var _x:Number;
@@ -18,6 +19,7 @@ public class Cell {
     private var _height:Number;
     private var _rowIndex:uint;
     private var _colIndex:uint;
+    private var _children:Vector.<CellObject>;
 
     public function get x():Number {
         return _x;
@@ -41,6 +43,15 @@ public class Cell {
 
     public function get colIndex():uint {
         return _colIndex;
+    }
+
+    public function get children():Vector.<CellObject> {
+        return _children;
+    }
+
+    public function addChild(child:CellObject):void {
+        _children.push(child);
+        child.cell = this;
     }
 }
 }

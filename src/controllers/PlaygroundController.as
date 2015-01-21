@@ -14,6 +14,8 @@ import models.commands.TurnRightCommand;
 import models.playground.Cell;
 
 import models.objects.Robot;
+import models.playground.CellObject;
+import models.playground.cellobjects.ExitCO;
 
 import starling.events.Event;
 
@@ -35,11 +37,13 @@ public class PlaygroundController {
                 _model.field[i].push(new Cell(cellWidth * j, cellHeight * i, cellWidth, cellHeight, i, j));
             }
         }
+
+        _model.field[5][5].addChild(new ExitCO());
     }
 
     public function createRobot():void {
         _model.mainRobot = new Robot();
-        _model.mainRobot.moveTo(_model.field[9][3]);
+        _model.mainRobot.moveTo(_model.field[10][3]);
     }
 
     public function generateDeck():void {
@@ -79,15 +83,31 @@ public class PlaygroundController {
 
     private function executeActiveCommandsRecursive(commandIndex:uint):void {
         if (commandIndex >= _model.activeCommands.length) {
+            executeCellActions(_model.mainRobot, false);
             startNewRound();
             return;
         }
 
         var curCommand:ICommand = _model.activeCommands[commandIndex];
         curCommand.addEventListener(CommandEvent.COMMAND_ENDED, function (event:Event):void {
-            executeActiveCommandsRecursive(commandIndex + 1);
+            trace(event.data);
+            executeCellActions(_model.mainRobot, true);
+            if (_model.activeCommands.length > 0)
+                executeActiveCommandsRecursive(event.data + 1);
         });
-        curCommand.execute(_model.mainRobot, _model);
+        curCommand.execute(_model.mainRobot, _model, commandIndex);
+    }
+
+    private function executeCellActions(robot:Robot, immediate:Boolean):void {
+        var curCell:Cell = robot.currentPosition;
+
+        for (var i:int = 0; i < curCell.children.length; i++) {
+            var cellObject:CellObject = curCell.children[i];
+            if (immediate)
+                cellObject.executeImmediate(robot, _model);
+            else
+                cellObject.execute(robot, _model);
+        }
     }
 
     public function playRound():void {
@@ -124,7 +144,7 @@ public class PlaygroundController {
     }
 
     public function preparePlayground():void {
-        generateField(Game.WIDTH - 1, Game.WIDTH - 1, 10, 10);
+        generateField(Game.WIDTH - 1, Game.WIDTH - 1, 11, 11);
         createRobot();
         generateDeck(); // temporary
         startNewRound();

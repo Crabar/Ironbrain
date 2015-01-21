@@ -2,6 +2,7 @@
  * Created by Crabar on 1/17/15.
  */
 package views {
+import controllers.ApplicationController;
 import controllers.PlaygroundController;
 
 import events.ModelEvent;
@@ -17,9 +18,12 @@ import flash.display.BitmapData;
 import flash.geom.Matrix;
 import flash.geom.Rectangle;
 
+import models.ApplicationModel;
+
 import models.BaseModel;
 import models.PlaygroundModel;
 import models.playground.Cell;
+import models.playground.CellObject;
 
 import starling.display.Image;
 import starling.display.Sprite;
@@ -43,12 +47,17 @@ public class PlaygroundView extends BaseView {
     override public function set model(value:BaseModel):void {
         super.model = value;
         curModel.addEventListener(ModelEvent.DATA_CHANGED, onDataChanged);
+        curModel.addEventListener(PlaygroundModel.WIN_GAME, onWinGame);
         _controller = new PlaygroundController(curModel);
         _controller.preparePlayground();
         drawField();
         initPlayer();
         drawAvailableCards();
         createActiveCardsList();
+    }
+
+    private function onWinGame(event:Event):void {
+        ApplicationController.instance.changeView(ApplicationModel.START_MENU_VIEW);
     }
 
 
@@ -133,6 +142,7 @@ public class PlaygroundView extends BaseView {
         for each (var columns:Vector.<Cell> in PlaygroundModel(model).field) {
             for each (var cell:Cell in columns) {
                 field.graphics.drawRect(cell.x, cell.y, cell.width, cell.height);
+                drawCellObjects(cell, _fieldLayer);
             }
         }
         var bounds:Rectangle = field.getBounds(field);
@@ -142,6 +152,25 @@ public class PlaygroundView extends BaseView {
         var image:Image = new Image(texture);
         image.touchable = false;
         _fieldLayer.addChild(image);
+    }
+
+    private function drawCellObjects(cell:Cell, container:Sprite):void {
+        for (var i:int = 0; i < cell.children.length; i++) {
+            var object:CellObject = cell.children[i];
+            var field:flash.display.Sprite = new flash.display.Sprite();
+            field.graphics.beginFill(0x22ff22);
+            field.graphics.drawRect(0, 0, cell.width - 2, cell.height - 2);
+            field.graphics.endFill();
+            var bounds:Rectangle = field.getBounds(field);
+            var bitmapData:BitmapData = new BitmapData(bounds.width, bounds.height, true, 0xffffff);
+            bitmapData.draw(field, new Matrix(1, 0, 0, 1, -bounds.left, -bounds.top));
+            var texture:Texture = Texture.fromBitmapData(bitmapData);
+            var image:Image = new Image(texture);
+            image.touchable = false;
+            image.x = cell.x + 1;
+            image.y = cell.y + 1;
+            container.addChild(image);
+        }
     }
 
     private function drawBackground():void {

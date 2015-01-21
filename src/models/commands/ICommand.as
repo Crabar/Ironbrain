@@ -11,7 +11,7 @@ import starling.events.Event;
 import models.objects.Robot;
 
 public interface ICommand {
-    function execute(curRobot:Robot, playgroundModel:PlaygroundModel):void;
+    function execute(curRobot:Robot, playgroundModel:PlaygroundModel, commandIndex:uint):void;
     function get title():String;
     function get textureName():String;
     function addEventListener(eventType:String, listener:Function):void;

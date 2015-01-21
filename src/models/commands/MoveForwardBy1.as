@@ -3,6 +3,8 @@
  */
 package models.commands {
 
+import events.CommandEvent;
+
 import models.PlaygroundModel;
 import models.objects.Robot;
 
@@ -11,8 +13,8 @@ public class MoveForwardBy1 extends BaseCommand implements ICommand {
     public function MoveForwardBy1() {
     }
 
-    override public function execute(curRobot:Robot, playgroundModel:PlaygroundModel):void {
-        super.execute(curRobot, playgroundModel);
+    override public function execute(curRobot:Robot, playgroundModel:PlaygroundModel, commandOrder:uint):void {
+        super.execute(curRobot, playgroundModel, commandOrder);
         var targetPositionRowIndex:uint = curRobot.currentPosition.rowIndex;
         var targetPositionColumnIndex:uint = curRobot.currentPosition.colIndex;
 
@@ -33,11 +35,15 @@ public class MoveForwardBy1 extends BaseCommand implements ICommand {
 
         if (targetPositionRowIndex < 0 || targetPositionRowIndex >= playgroundModel.field.length) {
             trace("incorrect target row position");
+            dispatchEventWith(CommandEvent.COMMAND_ENDED, false, _commandOrder);
+            destroy();
             return;
         }
 
         if (targetPositionColumnIndex < 0 || targetPositionColumnIndex >= playgroundModel.field[targetPositionRowIndex].length) {
             trace("incorrect target column position");
+            dispatchEventWith(CommandEvent.COMMAND_ENDED, false, _commandOrder);
+            destroy();
             return;
         }
 

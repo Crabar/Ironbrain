@@ -9,15 +9,23 @@ import models.playground.Cell;
 
 import models.objects.Robot;
 
+import starling.events.Event;
+
 public class PlaygroundModel extends BaseModel {
     public function PlaygroundModel() {
         super();
     }
+
+    public static const WIN_GAME:String = "winGame";
 
     public var field:Vector.<Vector.<Cell>>;
     public var mainRobot:Robot;
     public var deck:CommandsDeck;
     public var availableCommands:Vector.<ICommand>;
     public var activeCommands:Vector.<ICommand>;
+
+    public function winGame(robot:Robot):void {
+        dispatchEvent(new Event(WIN_GAME, false, robot));
+    }
 }
 }

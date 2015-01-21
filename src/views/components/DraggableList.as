@@ -17,7 +17,7 @@ public class DraggableList extends List implements IDropTarget {
     }
 
     private function onDragDrop(event:DragDropEvent):void {
-        var commandCard:ICommand = event.dragData.getDataForFormat("removeCard") as ICommand;
+        var commandCard:ICommand = event.dragData.getDataForFormat("removeCard").data as ICommand;
         dataProvider.addItem(commandCard);
     }
 

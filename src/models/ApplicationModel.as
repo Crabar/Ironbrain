@@ -42,12 +42,12 @@ public class ApplicationModel extends EventDispatcher {
     }
 
     private function initModels():void {
-        VIEW_MODELS[START_MENU_VIEW] = null;
-        VIEW_MODELS[PLAYGROUND_VIEW] = new PlaygroundModel();
+        VIEW_MODELS[START_MENU_VIEW] = BaseModel;
+        VIEW_MODELS[PLAYGROUND_VIEW] = PlaygroundModel;
     }
 
     public function getModel(view:String):BaseModel {
-        return VIEW_MODELS[view];
+        return new VIEW_MODELS[view];
     }
 }
 }

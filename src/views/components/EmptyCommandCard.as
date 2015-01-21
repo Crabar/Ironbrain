@@ -39,7 +39,7 @@ public class EmptyCommandCard extends Sprite implements IDragSource, IDropTarget
         addEventListener(DragDropEvent.DRAG_DROP, onDragDrop);
         addEventListener(DragDropEvent.DRAG_COMPLETE, onDragComplete);
         addEventListener(TouchEvent.TOUCH, onTouch);
-        drawCard(activeCommand);
+        redrawCard();
         addTextField();
     }
 
@@ -48,6 +48,10 @@ public class EmptyCommandCard extends Sprite implements IDragSource, IDropTarget
     private var _textField:TextField;
     private var _image:Image;
     private var _order:uint;
+
+    public function get order():uint {
+        return _order;
+    }
 
     public function get activeCommand():ICommand {
         return _model.activeCommands[_order];
@@ -63,9 +67,9 @@ public class EmptyCommandCard extends Sprite implements IDragSource, IDropTarget
         addChild(_textField);
     }
 
-    private function drawCard(command:ICommand):void {
+    private function redrawCard():void {
         var texture:Texture;
-        if (!command) {
+        if (!activeCommand) {
             if (_textField)
                 _textField.visible = true;
             //
@@ -91,27 +95,45 @@ public class EmptyCommandCard extends Sprite implements IDragSource, IDropTarget
     }
 
     private function onDataChanged(event:ModelEvent):void {
-        drawCard(activeCommand);
+        redrawCard();
     }
 
     private function onDragComplete(event:DragDropEvent):void {
         if (event.isDropped) {
-            _controller.removeActiveCommand(_order);
-            drawCard(activeCommand);
+            if (!event.dragData.getDataForFormat("removeCard").hasOwnProperty("noNeedToClearSource")) {
+                _controller.removeActiveCommand(_order);
+            }
+
+            redrawCard();
         }
     }
 
     private function onDragDrop(event:DragDropEvent):void {
-        if (activeCommand) {
-            _controller.addAvailableCommand(activeCommand);
+        if (event.dragData.hasDataForFormat("addCard")) {
+            if (activeCommand) {
+                _controller.addAvailableCommand(activeCommand);
+            }
+
+            _controller.addActiveCommand(_order, event.dragData.getDataForFormat("addCard") as ICommand);
+        } else if (event.dragData.hasDataForFormat("removeCard")) {
+            var sourceCard:EmptyCommandCard = EmptyCommandCard(event.dragData.getDataForFormat("removeCard").source);
+            var newCard:ICommand = event.dragData.getDataForFormat("removeCard").data;
+
+            if (activeCommand) {
+                _controller.addActiveCommand(sourceCard.order, activeCommand);
+                event.dragData.setDataForFormat("removeCard", {noNeedToClearSource: true});
+            }
+
+            _controller.addActiveCommand(order, newCard);
+
         }
 
-        _controller.addActiveCommand(_order, event.dragData.getDataForFormat("addCard") as ICommand);
-        drawCard(activeCommand);
+        redrawCard();
     }
 
     private function onDragEnter(event:DragDropEvent):void {
-        if (event.dragData.hasDataForFormat("addCard")) {
+        if (event.dragData.hasDataForFormat("addCard") ||
+                (event.dragData.hasDataForFormat("removeCard") && event.dragData.getDataForFormat("removeCard").source != this)) {
             DragDropManager.acceptDrag(this);
         }
     }
@@ -121,7 +143,7 @@ public class EmptyCommandCard extends Sprite implements IDragSource, IDropTarget
 
         if (touch && !DragDropManager.isDragging && activeCommand) {
             var dragData:DragData = new DragData();
-            dragData.setDataForFormat("removeCard", _model.activeCommands[_order]);
+            dragData.setDataForFormat("removeCard", {source: this, data: _model.activeCommands[_order]});
             var dragImage:Image = new Image(ResourcesManager.getTexture(activeCommand.textureName));
             dragImage.width = 40;
             dragImage.height = 40;
