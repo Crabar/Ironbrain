@@ -36,5 +36,9 @@ public class CommandsDeck {
 
         _cards = shuffledDeck;
     }
+
+    public function get size():uint {
+        return _cards ? _cards.length : 0;
+    }
 }
 }

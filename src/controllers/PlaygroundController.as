@@ -8,12 +8,11 @@ import events.ModelEvent;
 import models.CommandsDeck;
 import models.PlaygroundModel;
 import models.commands.ICommand;
-import models.commands.MoveForwardBy1;
+import models.commands.MoveForwardBy1Command;
 import models.commands.TurnLeftCommand;
 import models.commands.TurnRightCommand;
-import models.playground.Cell;
-
 import models.objects.Robot;
+import models.playground.Cell;
 import models.playground.CellObject;
 import models.playground.cellobjects.ExitCO;
 
@@ -46,14 +45,14 @@ public class PlaygroundController {
         _model.mainRobot.moveTo(_model.field[10][3]);
     }
 
-    public function generateDeck():void {
+    public function generateDeck(count:uint):void {
         _model.deck = new CommandsDeck();
 
-        for (var i:uint = 0; i < 60; i++) {
+        for (var i:uint = 0; i < count; i++) {
             var randomCommandIndex:uint = int(Math.random() * 3);
             switch (randomCommandIndex) {
                 case 0:
-                    _model.deck.addCommand(new MoveForwardBy1());
+                    _model.deck.addCommand(new MoveForwardBy1Command());
                     break;
                 case 1:
                     _model.deck.addCommand(new TurnLeftCommand());
@@ -67,11 +66,11 @@ public class PlaygroundController {
         _model.deck.shuffle();
     }
 
-    public function generateAvailableCards():void {
+    public function generateAvailableCommands(count:uint):void {
         _model.availableCommands = new <ICommand>[];
         var oneCommand:ICommand;
 
-        for (var i:int = 0; i < 8; i++) {
+        for (var i:int = 0; i < count; i++) {
             oneCommand = _model.deck.getNextCommand();
             _model.availableCommands.push(oneCommand);
         }
@@ -79,6 +78,48 @@ public class PlaygroundController {
 
     public function clearActiveCommands():void {
         _model.activeCommands = new Vector.<ICommand>(4);
+    }
+
+    public function playRound():void {
+        executeActiveCommandsRecursive(0);
+    }
+
+    public function startNewRound():void {
+        returnUnusedCommandsToDeck();
+        clearActiveCommands();
+        _model.deck.shuffle();
+        generateAvailableCommands(8);
+        _model.dispatchEventWith(ModelEvent.DATA_CHANGED);
+    }
+
+    public function addActiveCommand(order:uint, command:ICommand):void {
+        if (!_model.activeCommands) {
+            clearActiveCommands();
+        }
+
+        _model.activeCommands[order] = command;
+    }
+
+    public function removeActiveCommand(order:uint):void {
+        if (!_model.activeCommands) {
+            clearActiveCommands();
+        }
+
+        _model.activeCommands[order] = null;
+    }
+
+    public function addAvailableCommand(command:ICommand):void {
+        if (!_model.availableCommands) {
+            _model.availableCommands = new <ICommand>[];
+        }
+        _model.availableCommands.push(command);
+    }
+
+    public function preparePlayground():void {
+        generateField(Game.WIDTH - 1, Game.WIDTH - 1, 11, 11);
+        createRobot();
+        generateDeck(60); // temporary
+        startNewRound();
     }
 
     private function executeActiveCommandsRecursive(commandIndex:uint):void {
@@ -110,30 +151,6 @@ public class PlaygroundController {
         }
     }
 
-    public function playRound():void {
-        executeActiveCommandsRecursive(0);
-    }
-
-    public function startNewRound():void {
-        returnUnusedCommandsToDeck();
-        clearActiveCommands();
-        _model.deck.shuffle();
-        generateAvailableCards();
-        _model.dispatchEvent(new ModelEvent(ModelEvent.DATA_CHANGED));
-    }
-
-    public function addActiveCommand(order:uint, command:ICommand):void {
-        _model.activeCommands[order] = command;
-    }
-
-    public function removeActiveCommand(order:uint):void {
-        _model.activeCommands[order] = null;
-    }
-
-    public function addAvailableCommand(command:ICommand):void {
-        _model.availableCommands.push(command);
-    }
-
     private function returnUnusedCommandsToDeck():void {
         if (_model.availableCommands) {
             for (var i:int = 0; i < _model.availableCommands.length; i++) {
@@ -141,13 +158,6 @@ public class PlaygroundController {
                 _model.deck.addCommand(command);
             }
         }
-    }
-
-    public function preparePlayground():void {
-        generateField(Game.WIDTH - 1, Game.WIDTH - 1, 11, 11);
-        createRobot();
-        generateDeck(); // temporary
-        startNewRound();
     }
 }
 }

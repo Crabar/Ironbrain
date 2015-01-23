@@ -10,7 +10,6 @@ public class StartMenuController {
     }
 
     public function startNewGame():void {
-        trace("new game started");
         ApplicationController.instance.changeView(ApplicationModel.PLAYGROUND_VIEW);
     }
 }

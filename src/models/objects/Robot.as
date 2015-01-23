@@ -17,12 +17,15 @@ import views.objects.*;
 public class Robot extends EventDispatcher {
     public function Robot() {
         super();
-        _robotView = new RobotView();
     }
 
     private var _robotView:RobotView;
 
     public function get view():RobotView {
+        if (!_robotView) {
+            _robotView = new RobotView();
+        }
+
         return _robotView;
     }
 
@@ -41,7 +44,7 @@ public class Robot extends EventDispatcher {
         var tween:Tween = new Tween(view, 1, Transitions.EASE_IN_OUT);
         tween.moveTo(targetCell.x + (targetCell.width) / 2, targetCell.y + (targetCell.height) / 2);
         tween.onComplete = function ():void {
-            dispatchEventWith(AnimationEvent.ANIMATION_ENDED)
+            dispatchEventWith(AnimationEvent.ANIMATION_ENDED);
         };
         Starling.juggler.add(tween);
         _currentPosition = targetCell;
@@ -51,7 +54,7 @@ public class Robot extends EventDispatcher {
         var tween:Tween = new Tween(view, 1, Transitions.EASE_IN_OUT);
         tween.animate("rotation", (view.rotation + (degrees / 180) * Math.PI));
         tween.onComplete = function ():void {
-            dispatchEventWith(AnimationEvent.ANIMATION_ENDED)
+            dispatchEventWith(AnimationEvent.ANIMATION_ENDED);
         };
         Starling.juggler.add(tween);
     }

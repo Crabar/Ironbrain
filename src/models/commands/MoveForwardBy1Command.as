@@ -9,8 +9,8 @@ import models.PlaygroundModel;
 import models.objects.Robot;
 
 [Event(name="commandEnded", type="events.CommandEvent")]
-public class MoveForwardBy1 extends BaseCommand implements ICommand {
-    public function MoveForwardBy1() {
+public class MoveForwardBy1Command extends BaseCommand implements ICommand {
+    public function MoveForwardBy1Command() {
     }
 
     override public function execute(curRobot:Robot, playgroundModel:PlaygroundModel, commandOrder:uint):void {
