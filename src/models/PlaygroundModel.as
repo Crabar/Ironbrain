@@ -17,6 +17,8 @@ public class PlaygroundModel extends BaseModel {
     }
 
     public static const WIN_GAME:String = "winGame";
+    public static const PLAYING_STARTED:String = "playingStarted";
+    public static const PLAYING_ENDED:String = "platingEnded";
 
     public var field:Vector.<Vector.<Cell>>;
     public var mainRobot:Robot;

@@ -101,9 +101,6 @@ public class PlaygroundView extends BaseView {
             var renderer:CommandCardItemRenderer = new CommandCardItemRenderer();
             renderer.width = 40;
             renderer.height = 40;
-            renderer.labelFunction = function (data:Object):String {
-                return "";
-            };
             return renderer;
         };
 
@@ -180,7 +177,7 @@ public class PlaygroundView extends BaseView {
         addChild(_background);
     }
 
-    private function onDataChanged(event:ModelEvent):void {
+    private function onDataChanged(event:Event):void {
         if (_availableCardsList) {
             drawAvailableCards();
         }

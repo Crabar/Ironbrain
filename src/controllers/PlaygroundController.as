@@ -81,7 +81,13 @@ public class PlaygroundController {
     }
 
     public function playRound():void {
-        executeActiveCommandsRecursive(0);
+        var isAllCommandsExists:Boolean = _model.activeCommands.every(function (element:ICommand, index:int, array:Vector.<ICommand>):Boolean {
+            return element
+        });
+        if (isAllCommandsExists) {
+            _model.dispatchEventWith(PlaygroundModel.PLAYING_STARTED);
+            executeActiveCommandsRecursive(0);
+        }
     }
 
     public function startNewRound():void {
@@ -125,6 +131,7 @@ public class PlaygroundController {
     private function executeActiveCommandsRecursive(commandIndex:uint):void {
         if (commandIndex >= _model.activeCommands.length) {
             executeCellActions(_model.mainRobot, false);
+            endRound();
             startNewRound();
             return;
         }
@@ -137,6 +144,10 @@ public class PlaygroundController {
                 executeActiveCommandsRecursive(event.data + 1);
         });
         curCommand.execute(_model.mainRobot, _model, commandIndex);
+    }
+
+    private function endRound():void {
+        _model.dispatchEventWith(PlaygroundModel.PLAYING_ENDED);
     }
 
     private function executeCellActions(robot:Robot, immediate:Boolean):void {

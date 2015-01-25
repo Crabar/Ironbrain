@@ -21,6 +21,7 @@ import models.commands.ICommand;
 
 import starling.display.Image;
 import starling.display.Sprite;
+import starling.events.Event;
 import starling.events.Touch;
 import starling.events.TouchEvent;
 import starling.events.TouchPhase;
@@ -94,7 +95,7 @@ public class EmptyCommandCard extends Sprite implements IDragSource, IDropTarget
         }
     }
 
-    private function onDataChanged(event:ModelEvent):void {
+    private function onDataChanged(event:Event):void {
         redrawCard();
     }
 
