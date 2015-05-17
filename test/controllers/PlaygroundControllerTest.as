@@ -22,38 +22,39 @@ public class PlaygroundControllerTest {
     public var rule:MockolateRule = new MockolateRule();
     [Mock]
     public var testCommand:ICommand;
-    [Mock]
-    public var model:PlaygroundModel;
+
+    private var _model:PlaygroundModel;
     private var _playgroundController:PlaygroundController;
 
     [Before]
     public function setUp():void {
-        _playgroundController = new PlaygroundController(model);
+        _model = new PlaygroundModel();
+        _playgroundController = new PlaygroundController(_model);
     }
 
     [Test]
     public function testGenerateAvailableCommands():void {
-        assertThat(model.availableCommands, nullValue());
+        assertThat(_model.availableCommands, nullValue());
         _playgroundController.generateDeck(100);
         _playgroundController.generateAvailableCommands(100);
-        assertThat(model.availableCommands.length, equalTo(100));
+        assertThat(_model.availableCommands.length, equalTo(100));
 
     }
 
     [Test]
     public function testGenerateDeck():void {
-        assertThat(model.deck, equalTo(null));
+        assertThat(_model.deck, equalTo(null));
         _playgroundController.generateDeck(100);
-        assertThat(model.deck.size, equalTo(100));
+        assertThat(_model.deck.size, equalTo(100));
     }
 
     [Test]
     public function testGenerateField():void {
-        assertThat(model.field, nullValue());
+        assertThat(_model.field, nullValue());
         _playgroundController.generateField(1000, 1000, 20, 20);
-        assertThat(model.field.length, equalTo(20));
-        for (var i:int = 0; i < model.field.length; i++) {
-            var row:Vector.<Cell> = model.field[i];
+        assertThat(_model.field.length, equalTo(20));
+        for (var i:int = 0; i < _model.field.length; i++) {
+            var row:Vector.<Cell> = _model.field[i];
             assertThat(row.length, equalTo(20));
             for (var j:int = 0; j < row.length; j++) {
                 assertThat(row[j], instanceOf(Cell));
@@ -63,30 +64,30 @@ public class PlaygroundControllerTest {
 
     [Test]
     public function testAddAvailableCommand():void {
-        assertThat(model.availableCommands, nullValue());
+        assertThat(_model.availableCommands, nullValue());
         _playgroundController.addAvailableCommand(testCommand);
-        assertThat(model.availableCommands.length, equalTo(1));
+        assertThat(_model.availableCommands.length, equalTo(1));
         _playgroundController.addAvailableCommand(testCommand);
         _playgroundController.addAvailableCommand(testCommand);
         _playgroundController.addAvailableCommand(testCommand);
-        assertThat(model.availableCommands.length, equalTo(4));
+        assertThat(_model.availableCommands.length, equalTo(4));
     }
 
     [Test]
     public function testStartNewRound():void {
         _playgroundController.generateDeck(60);
         _playgroundController.startNewRound();
-        assertThat(model.deck.size, equalTo(52));
-        assertThat(model.availableCommands.length, equalTo(8));
-        assertThat(model, received().method("dispatchEventWith").args(equalTo(ModelEvent.DATA_CHANGED)));
+        assertThat(_model.deck.size, equalTo(52));
+        assertThat(_model.availableCommands.length, equalTo(8));
     }
 
     [Test]
     public function testAddAndRemoveActiveCommand():void {
+        _playgroundController.clearActiveCommands();
         _playgroundController.addActiveCommand(0, testCommand);
-        assertThat(model.activeCommands[0], equalTo(testCommand));
+        assertThat(_model.activeCommands[0], equalTo(testCommand));
         _playgroundController.removeActiveCommand(0);
-        assertThat(model.activeCommands[0], nullValue());
+        assertThat(_model.activeCommands[0], nullValue());
 
     }
 

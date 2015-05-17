@@ -9,13 +9,12 @@ import flash.geom.Rectangle;
 import starling.display.Image;
 import starling.textures.Texture;
 
-public class RobotView extends Image {
-    public function RobotView() {
-        super(getRobotTexture());
-        alignPivot();
+public class GreenRobotView extends BaseRobotView implements IRobotView {
+    public function GreenRobotView() {
+        super();
     }
 
-    private static function getRobotTexture():Texture {
+    override public function getTexture():Texture {
         var sprite:flash.display.Sprite = new flash.display.Sprite();
         sprite.graphics.lineStyle(1, 0x444444);
         sprite.graphics.beginFill(0x00ff00);

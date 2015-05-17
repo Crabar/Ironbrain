@@ -5,6 +5,10 @@ package models.commands {
 import events.AnimationEvent;
 import events.CommandEvent;
 
+import flash.net.registerClassAlias;
+import flash.utils.getDefinitionByName;
+import flash.utils.getQualifiedClassName;
+
 
 import models.PlaygroundModel;
 

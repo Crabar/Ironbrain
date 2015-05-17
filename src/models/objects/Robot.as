@@ -15,17 +15,14 @@ import views.objects.*;
 
 [Event(name="animationEnded", type="events.AnimationEvent")]
 public class Robot extends EventDispatcher {
-    public function Robot() {
+    public function Robot(skin:BaseRobotView) {
         super();
+        _robotView = skin;
     }
 
-    private var _robotView:RobotView;
+    private var _robotView:BaseRobotView;
 
-    public function get view():RobotView {
-        if (!_robotView) {
-            _robotView = new RobotView();
-        }
-
+    public function get view():BaseRobotView {
         return _robotView;
     }
 

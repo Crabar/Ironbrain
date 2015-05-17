@@ -3,6 +3,7 @@
  */
 package utils {
 import flash.filesystem.File;
+import flash.system.Capabilities;
 
 import starling.textures.Texture;
 
@@ -17,6 +18,7 @@ public class ResourcesManager {
 
     public static function loadTextures():void {
         var appDir:File = File.applicationDirectory;
+        _assetManager.verbose = Capabilities.isDebugger;
         _assetManager.enqueue(appDir.resolvePath("assets/textures"));
         _assetManager.loadQueue(onLoadAssetsProgress);
     }
@@ -26,7 +28,8 @@ public class ResourcesManager {
     }
 
     public static function getTexture(name:String):Texture {
-        return _assetManager.getTexture(name);
+        var texture:Texture = _assetManager.getTexture(name);
+        return texture ? texture : Texture.fromColor(10, 10, 0xface8d);
     }
 }
 }

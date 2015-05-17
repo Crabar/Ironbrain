@@ -3,6 +3,7 @@
  */
 package views {
 import controllers.ApplicationController;
+import controllers.MultiplayerController;
 import controllers.PlaygroundController;
 
 import events.ModelEvent;
@@ -22,6 +23,7 @@ import models.ApplicationModel;
 
 import models.BaseModel;
 import models.PlaygroundModel;
+import models.objects.Robot;
 import models.playground.Cell;
 import models.playground.CellObject;
 
@@ -48,10 +50,13 @@ public class PlaygroundView extends BaseView {
         super.model = value;
         curModel.addEventListener(ModelEvent.DATA_CHANGED, onDataChanged);
         curModel.addEventListener(PlaygroundModel.WIN_GAME, onWinGame);
+        curModel.addEventListener(MultiplayerController.USER_CONNECTED, onUserConnected);
         _controller = new PlaygroundController(curModel);
         _controller.preparePlayground();
+    }
+
+    private function onUserConnected(event:Event):void {
         drawField();
-        initPlayer();
         drawAvailableCards();
         createActiveCardsList();
     }
@@ -75,10 +80,6 @@ public class PlaygroundView extends BaseView {
 
     private function drawAvailableCards():void {
         _availableCardsList.dataProvider = new ListCollection(curModel.availableCommands);
-    }
-
-    private function initPlayer():void {
-        _robotsLayer.addChild(curModel.mainRobot.view);
     }
 
     private function createPlayButton():void {
@@ -110,7 +111,6 @@ public class PlaygroundView extends BaseView {
     }
 
     private function createActiveCardsList():void {
-        _controller.clearActiveCommands();
         for (var i:int = 0; i < 4; i++) {
             var newEmptyCard:EmptyCommandCard = new EmptyCommandCard(_controller, curModel);
             newEmptyCard.setOrder(i);
@@ -181,10 +181,16 @@ public class PlaygroundView extends BaseView {
         if (_availableCardsList) {
             drawAvailableCards();
         }
+
+        for (var i:int = 0; i < curModel.allRobots.length; i++) {
+            var robot:Robot = curModel.allRobots[i];
+            if (robot.view.parent == null)
+                _robotsLayer.addChild(robot.view);
+        }
     }
 
     private function onButtonClick(event:Event):void {
-        _controller.playRound();
+        _controller.finishRound();
     }
 }
 }

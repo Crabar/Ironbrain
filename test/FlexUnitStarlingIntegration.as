@@ -5,6 +5,8 @@ package
 
 import mockolate.runner.MockolateRule;
 
+import org.fluint.uiImpersonation.UIImpersonator;
+
 import starling.core.Starling;
 	import starling.display.Sprite;
 	import starling.events.Event;
